@@ -43,6 +43,10 @@ class FlightController:
         self._submit('land')
 
     def request(self, event, **data):
+        # A completed dispatch must not reject a service just because the
+        # timer has not consumed its Future yet. This permits interruption
+        # without adding gaps between precision velocity corrections.
+        self._finish_dispatch(self.clock())
         s = self.machine.state
         if self.pending:
             raise ValueError('RPC dispatch pending; retry after it completes')
@@ -113,8 +117,7 @@ class FlightController:
         self.machine.transition('failsafe', reason=reason)
         # No guaranteed automatic landing on connection loss. Explicit land may be retried.
 
-    def tick(self):
-        now = self.clock()
+    def _finish_dispatch(self, now):
         if self.pending and self.pending[1].done():
             command, future = self.pending
             self.pending = None
@@ -142,6 +145,10 @@ class FlightController:
                     self.disarmed = True
             except Exception as exc:
                 self._fail('AirSim {} failed: {}'.format(command, exc))
+
+    def tick(self):
+        now = self.clock()
+        self._finish_dispatch(now)
         if self.takeoff_result is not None and self.takeoff_result.done():
             result, self.takeoff_result = self.takeoff_result, None
             try:

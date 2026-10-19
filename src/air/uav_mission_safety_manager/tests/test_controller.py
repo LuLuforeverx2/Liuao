@@ -91,6 +91,22 @@ class TestController(unittest.TestCase):
         self.assertEqual(self.c.machine.state, State.LANDING)
         self.assertEqual(self.adapter.calls[-1][0], 'land')
 
+    def test_land_consumes_completed_precision_dispatch_before_next_timer(self):
+        self.c.request('return')
+        self.finish_command()
+        self.observe((20.06, 30., -8.), velocity=(0., 0., 0.))
+        self.assertEqual(self.adapter.calls[-1][0], 'velocity')
+        self.c.tick()
+        # The last status can still report pending even though its Future
+        # completed. A service must consume it without waiting for the timer.
+        self.adapter.calls[-1][2].set_result(None)
+        self.adapter.reads[-1].set_result({
+            'position': (20.04, 30., -8.), 'velocity': (0., 0., 0.), 'landed': False})
+        self.assertEqual(self.c.machine.state, State.RETURNING)
+        self.c.request('land')
+        self.assertEqual(self.c.machine.state, State.LANDING)
+        self.assertEqual(self.adapter.calls[-1][0], 'land')
+
     def test_pending_rpc_does_not_block_tick_or_timeout(self):
         self.c.request('goto', x=30, y=30, z=-8)
         self.now = 3

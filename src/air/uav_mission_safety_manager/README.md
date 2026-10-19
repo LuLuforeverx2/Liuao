@@ -105,6 +105,7 @@ ros2 service call /uav_mission_safety_manager/land std_srvs/srv/Trigger '{}'
 * 替换飞行任务前请求取消旧任务，并最多等待 2 秒确认旧 Future 结束；新任务随后在同一飞行线程启动。
   旧任务无法结束时拒绝发出新飞行指令并报告故障，不让降落与旧航点并发执行。
 * 同时最多一个指令派发、一个遥测请求；正在派发时拒绝新指令，请稍后重试。
+* 用户请求到来时先处理已完成的派发 Future，避免因等待定时器收尾而错误拒绝服务；仍在派发中的指令继续拒绝重入。
 * 飞行期间仍可接受暂停/降落，不需要等待上一段飞行结束。
 * 旧指令前发起的遥测样本不会完成新指令的状态转换。
 * 遥测超过 2 秒未更新、超高或飞行阶段超过 120 秒会进入 FAILSAFE。超时计时使用单调时钟。
@@ -132,7 +133,7 @@ ros2 topic pub -r 2 /uav/telemetry std_msgs/msg/String '{data: "{\"altitude\":10
 
 实际模拟器中已完成连接→解锁→起飞→航点中暂停/继续→返航→自动落地的联动测试，
 详见 [AIRSIM_VALIDATION.md](AIRSIM_VALIDATION.md)，其中保留失败轮次和起飞 False 异常。
-尚需通过 ROS 话题/服务重跑完整流程，并补测返航中显式降落及模拟器断线。
+补充的 ROS 接口完整流程、起点上方返航中显式降落及 RPC 传输中断结果亦记录在该文档中。
 不把离线测试当作实际模拟器飞行验证。
 
 也可在没有其他控制节点运行时，用实际适配器与控制器执行自动模拟器复测：
@@ -146,3 +147,31 @@ python3 src/air/uav_mission_safety_manager/tests/live_airsim_validation.py \
 
 该脚本记录控制器与真实 AirSim 的联动，未经过 ROS 话题/服务；ROS 通信另由冒烟测试验证。
 重置后须连续 3 秒确认落地且停稳，才记录起点并解锁。失败后的恢复降落不计为流程通过。
+
+### 通过 ROS 接口执行实际模拟器补测
+
+以下脚本用于实际飞行验证。先确认 Air 场景已加载、41451 端口可达，
+并停止其他飞行控制节点；脚本自行启动已安装的 launch，通过命令话题与 Trigger 服务控制。
+每次会重置模拟无人机并起飞，三种用例必须依次执行。
+
+```bash
+source /opt/ros/foxy/setup.bash
+source install/setup.bash
+# 仓库根目录执行；每条命令结束并确认落地后再执行下一条。
+ROS_DOMAIN_ID=93 python3 src/air/uav_mission_safety_manager/tests/ros_airsim_validation.py \
+  --host "$(ip route | awk '/default/ {print $3; exit}')" \
+  --case mission --log /tmp/ros_airsim_mission.jsonl --fly
+ROS_DOMAIN_ID=93 python3 src/air/uav_mission_safety_manager/tests/ros_airsim_validation.py \
+  --host "$(ip route | awk '/default/ {print $3; exit}')" \
+  --case return_land --log /tmp/ros_airsim_return_land.jsonl --fly
+ROS_DOMAIN_ID=93 python3 src/air/uav_mission_safety_manager/tests/ros_airsim_validation.py \
+  --host "$(ip route | awk '/default/ {print $3; exit}')" \
+  --case disconnect --log /tmp/ros_airsim_disconnect.jsonl --fly
+```
+
+`mission` 检查水平航点、暂停停稳、继续保留指令速度及返航自动降落；
+`return_land` 在返航到起点上方后、自动降落前显式请求降落，不能代表远离起点的任意位置降落；
+`disconnect` 切断节点专用 TCP 转发连接，检查 FAILSAFE 和持续状态发布，模拟器本身保持运行。
+后者是 RPC 传输中断测试，不能替代模拟器进程崩溃测试，也不证明断线后会自动降落。
+脚本记录服务响应耗时、状态及 PASS/FAIL；启动日志写入同名 `.node.log`。
+停止被测节点后的独立恢复降落单独记录，不算被测流程通过。
