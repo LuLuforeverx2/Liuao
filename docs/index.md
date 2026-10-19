@@ -94,6 +94,8 @@ ROS每章节运行代码:
 
 ## 5. 空域载具 <span id='air_vehicle'></span>
 
+* [无人机任务管理与安全状态机](./air/uav_mission_safety_manager.md)
+
 * [无人机飞行轨迹类型识别与 ROS2 自动任务日志](./air/flight_pattern_recognition.md)
 
 * [无人机遥测异常检测与 ROS2 在线诊断](./air/telemetry_diagnostics.md)
