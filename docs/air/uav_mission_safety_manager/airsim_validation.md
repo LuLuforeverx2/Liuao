@@ -88,17 +88,17 @@ ROS 进入 EXECUTING 依据离地遥测，不能据此宣称起飞 RPC 返回 Tr
 
 保留三份日志：
 
-1. [`airsim_retest_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest_2026_10_19.jsonl)：首次脚本 reset 后只等 1 秒，
+1. [`airsim_retest.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest.jsonl)：首次脚本 reset 后只等 1 秒，
    模拟器短暂报告 Landed，但无人机仍在下降。错误捕获 home z=3.6369，
    起飞抛出正在移动（约 7.016 米/秒）的异常，本次失败，不计入通过。
    随后补充预检：连续 3 秒落地、位置稳定且速度不超过 0.1 米/秒才开始；
    控制器连接也拒绝正在移动的落地遥测。后续会话以 reset 重新开始。
-2. [`airsim_retest_stable_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest_stable_2026_10_19.jsonl)：完整流程通过，最终 LANDED，
+2. [`airsim_retest_stable.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest_stable.jsonl)：完整流程通过，最终 LANDED，
    起点 `(0, 0, 11.196149826)`，最终约 `(-0.020503, 0, 11.205310)`，
    三维误差约 0.022456 米。暂停后独立遥测合速度约 0.0611 米/秒。
    该轮起飞还未返回便被航点替换，因此记录的 False 可能来自取消，
    不能用作原始起飞异常的独立复现证据。
-3. [`airsim_retest_final_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest_final_2026_10_19.jsonl)：等待起飞 Future 自行完成后再发航点。
+3. [`airsim_retest_final.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/airsim_retest_final.jsonl)：等待起飞 Future 自行完成后再发航点。
    起点 `(0, 0, 11.196171761)`，起飞约 3.44 秒后返回 False，
    此时遥测 z 约 9.660652，已升高约 1.5355 米；未用新航点取消起飞。
    原异常在本轮再次复现，原因仍未确定。
@@ -134,30 +134,30 @@ ROS 进入 EXECUTING 依据离地遥测，不能据此宣称起飞 RPC 返回 Tr
 
 ### ROS 接口实际 AirSim 续测
 
-1. [`ros_airsim_mission_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission_2026_10_19.jsonl)：完整流程通过。
+1. [`ros_airsim_mission.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission.jsonl)：完整流程通过。
    暂停服务响应约 0.00350 秒，3 秒后独立遥测速度约 0.03093 米/秒，原目标保留；
    继续响应约 0.00342 秒，保留 0.5 米/秒指令速度；返航响应约 0.00301 秒。
    最终自动 LANDED，三维起点误差约 0.031468 米，未人工降落或解除解锁。
    此轮在下述返航服务调度修复前执行；修复后完整流程另行重跑。
-2. [`ros_airsim_return_land_missed_window_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land_missed_window_2026_10_19.jsonl)：第一次补测漏过返航中断窗口。
+2. [`ros_airsim_return_land_missed_window.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land_missed_window.jsonl)：第一次补测漏过返航中断窗口。
    虽然脚本输出 PASS 且最终落地，但显式 land 前已自动进入 LANDING，
    只能证明落地，不能计为返航中显式降落通过。原始日志保留，不改写其 PASS 行。
    复核发现末段修正可在同一次 tick 内完成旧派发又立即发出新派发，持续显示 pending，
    不利于用户服务插入。最初尝试派发完成后留出一个定时器周期，增加回归测试；
    该尝试随后出现返航超时，已弃用，最终处理方式见下文。
    补测脚本同时记录服务请求前状态，并要求显式 land 前仍处于 RETURNING。
-3. [`ros_airsim_return_land_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land_2026_10_19.jsonl)：上述留出周期方案下，该用例通过。
+3. [`ros_airsim_return_land.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land.jsonl)：上述留出周期方案下，该用例通过。
    land 请求前明确记录 RETURNING，位置约 `(0.02498, 0.000001, 6.41338)`；
    服务约 0.00293 秒返回 Accepted: LANDING，最终 LANDED，三维起点误差约 0.119233 米。
    该用例在起点水平位置附近中断，不能推广为远离起点或任意地形显式降落。
-4. [`ros_airsim_disconnect_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_disconnect_2026_10_19.jsonl)：RPC 传输中断检查通过。
+4. [`ros_airsim_disconnect.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_disconnect.jsonl)：RPC 传输中断检查通过。
    在起点上方飞行后切断节点专用 TCP 转发，约 2.4003 秒进入 FAILSAFE，
    故障原因为 telemetry timeout 2.2s；切断后仍收到 12 条状态消息。
    模拟器进程保持运行，此结果不等同于模拟器进程崩溃或自动故障降落通过。
    独立恢复降落在停止被测节点后执行并单独记录，不计入 FAILSAFE 自动恢复能力。
 
 本轮起飞 Future 自行完成后再发航点，仍返回 False；此已知异常没有被消除。
-留出周期方案的完整任务重跑见 [`ros_airsim_mission_yield_timeout_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission_yield_timeout_2026_10_19.jsonl)：
+留出周期方案的完整任务重跑见 [`ros_airsim_mission_yield_timeout.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission_yield_timeout.jsonl)：
 返航末段高度停在目标上方约 0.14 米，120 秒后进入 FAILSAFE，不能计为通过。
 停止节点后的独立恢复降落返回 True，解除解锁后新遥测确认 Landed。
 最终改为服务请求到来时先处理已完成的派发 Future，不改变连续修正节奏；
@@ -183,9 +183,9 @@ Landed、速度为 0，已追加 `recovery_followup_observation`，没有改写�
 
 | 日志 | 检查结果 |
 | --- | --- |
-| [`ros_airsim_mission_verified_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission_verified_2026_10_19.jsonl) | PASS；暂停服务约 2.90 毫秒，暂停后合速度约 0.03085 米/秒；继续约 2.13 毫秒，原目标及 0.5 米/秒指令保留；返航约 3.33 毫秒；自动 LANDED，三维起点误差 0.024154 米。 |
-| [`ros_airsim_return_land_verified_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land_verified_2026_10_19.jsonl) | PASS；请求前为 RETURNING，位置约 `(0.05286, 0.000002, 6.32169)`；land 服务约 2.13 毫秒接受并进入 LANDING；自动 LANDED，三维起点误差 0.114227 米。 |
-| [`ros_airsim_disconnect_verified_2026_10_19.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_disconnect_verified_2026_10_19.jsonl) | PASS；RPC 传输中断后约 2.4000 秒进入 FAILSAFE，期间收到 12 条状态消息；不代表断线自动降落通过。 |
+| [`ros_airsim_mission_verified.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_mission_verified.jsonl) | PASS；暂停服务约 2.90 毫秒，暂停后合速度约 0.03085 米/秒；继续约 2.13 毫秒，原目标及 0.5 米/秒指令保留；返航约 3.33 毫秒；自动 LANDED，三维起点误差 0.024154 米。 |
+| [`ros_airsim_return_land_verified.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_return_land_verified.jsonl) | PASS；请求前为 RETURNING，位置约 `(0.05286, 0.000002, 6.32169)`；land 服务约 2.13 毫秒接受并进入 LANDING；自动 LANDED，三维起点误差 0.114227 米。 |
+| [`ros_airsim_disconnect_verified.jsonl`](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/ros_airsim_disconnect_verified.jsonl) | PASS；RPC 传输中断后约 2.4000 秒进入 FAILSAFE，期间收到 12 条状态消息；不代表断线自动降落通过。 |
 
 最终断线用例停止节点后独立降落返回 True，受保护解除解锁返回 True，新遥测确认 `landed_state=0`。
 三个脚本均已退出，没有留下 ROS 飞行控制节点。
@@ -197,7 +197,7 @@ Landed、速度为 0，已追加 `recovery_followup_observation`，没有改写�
 
 ## 文件整理说明（2026-10-20）
 
-教程和验证记录集中在本模块文档目录，原始日志迁移到源码包的 `tests/logs/`，日期统一为下划线分隔。日志内容未修改，原名映射与 SHA256 见 [日志索引](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/README.md)。目录整理后的构建和离线检查不算新增实际飞行验证；上述飞行结果仍来自 2026-10-19。
+教程和验证记录集中在本模块文档目录，原始日志迁移到源码包的 `tests/logs/`，文件名不包含日期，测试日期保留在记录正文中。日志内容未修改，文件索引与 SHA256 见 [日志索引](https://github.com/OpenHUTB/ros2/blob/master/src/air/uav_mission_safety_manager/tests/logs/README.md)。目录整理后的构建和离线检查不算新增实际飞行验证；上述飞行结果仍来自 2026-10-19。
 
 整理后重新通过 Foxy colcon 构建、29 项单元测试、ROS 冒烟测试。
 已分别启动并停止 `ros2 run ... mission_manager` 和离线 `main.launch.py`，确认新 `main.py` 入口可用；

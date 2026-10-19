@@ -7,7 +7,7 @@ ROS2 Foxy / Ubuntu 20.04 的 `ament_python` 包，支持单航点、暂停/继�
 - [模块概览](../../../docs/air/uav_mission_safety_manager/overview.md)
 - [构建与运行教程](../../../docs/air/uav_mission_safety_manager/usage.md)：依赖、WSL 地址、命令话题、服务、离线与实际模拟器复测命令。
 - [AirSim 实测及已知限制](../../../docs/air/uav_mission_safety_manager/airsim_validation.md)
-- [原始日志索引](tests/logs/README.md)：历史文件名映射及移动前后一致的 SHA256。
+- [原始日志索引](tests/logs/README.md)：文件说明及内容一致的 SHA256。
 
 以上链接用于仓库源码视图；安装后的 share 目录可通过项目文档站 https://openhutb.github.io/ros2/ 阅读教程。
 
@@ -41,7 +41,7 @@ uav_mission_safety_manager/
 ```
 
 教程位于 `docs/air/uav_mission_safety_manager/`，日志位于 `tests/logs/`。
-Python 文件使用英文下划线，日志日期使用 `yyyy_mm_dd`；README、LICENSE 和 ROS 约定文件名保持通用写法。
+Python 与日志文件使用英文下划线命名，文件名不包含日期；README、LICENSE 和 ROS 约定文件名保持通用写法。
 本包采用 ROS2 标准 Python 包布局，不使用参考 ROS1 项目的 catkin 安装方式。
 
 ## 快速构建与检查
