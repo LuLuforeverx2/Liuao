@@ -2,7 +2,9 @@
 
 本模块面向 ROS2 Foxy 与 AirSim，提供单航点控制、暂停继续、返航自动降落以及高度/遥测超时检测。
 
-源码与完整操作步骤：[uav_mission_safety_manager](https://github.com/OpenHUTB/ros2/tree/master/src/air/uav_mission_safety_manager)。
+[构建与运行教程](usage.md) · [AirSim 实测记录](airsim_validation.md)
+
+源码：[uav_mission_safety_manager](https://github.com/OpenHUTB/ros2/tree/master/src/air/uav_mission_safety_manager)。
 
 ## 状态与返航流程
 
@@ -39,7 +41,7 @@ ROS_DOMAIN_ID=87 python3 src/air/uav_mission_safety_manager/tests/ros_smoke.py
 传输中断用例没有关闭模拟器进程，后续独立恢复降落不代表 FAILSAFE 能自动降落。
 起飞 RPC 仍会返回 False 而遥测显示已离地，该异常尚未解决。
 
-详细数值、失败轮次、日志和复测命令见源码目录的 `AIRSIM_VALIDATION.md` 与 `README.md`。
+详细数值与失败轮次见 [AirSim 实测记录](airsim_validation.md)；构建与复测命令见 [运行教程](usage.md)。
 
 当前是原型，尚未实现任务队列、ROS2 Action、避障和实际电子围栏。FAILSAFE 不保证自动降落，
 关闭节点不会停止模拟器里的飞行任务。坐标使用 AirSim 本地 NED，不能直接当作 ROS ENU。

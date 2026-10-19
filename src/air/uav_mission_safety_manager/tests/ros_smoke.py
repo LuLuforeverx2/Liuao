@@ -8,7 +8,7 @@ from rclpy.executors import SingleThreadedExecutor
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 
-from uav_mission_safety_manager.mission_node import MissionNode
+from uav_mission_safety_manager.main import MissionNode
 from uav_mission_safety_manager.state_machine import State
 
 
@@ -23,7 +23,7 @@ class PendingAdapter:
 def main():
     rclpy.init(args=['--ros-args', '-p', 'use_airsim:=true'])
     executor = SingleThreadedExecutor()
-    with patch('uav_mission_safety_manager.mission_node.AirSimAdapter', return_value=PendingAdapter()):
+    with patch('uav_mission_safety_manager.main.AirSimAdapter', return_value=PendingAdapter()):
         node = MissionNode()
     observer = rclpy.create_node('mission_smoke_observer')
     executor.add_node(node)

@@ -1,0 +1,6 @@
+# Keep reviewed historical evidence despite the repository-wide logs/ rule.
+!logs/
+logs/*
+!logs/README.md
+!logs/*.jsonl
+!logs/horizontal_return_2026_10_19.log
