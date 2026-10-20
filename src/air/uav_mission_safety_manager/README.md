@@ -17,6 +17,7 @@ uav_mission_safety_manager/
 ├── README.md
 ├── LICENSE
 ├── package.xml
+├── requirements.txt
 ├── setup.py
 ├── setup.cfg
 ├── config/mission.yaml
@@ -43,7 +44,17 @@ Python 文件使用英文下划线命名，文件名不包含日期；README、L
 
 ## 快速构建与检查
 
-在仓库根目录执行（按需先运行教程中的 rosdep 安装步骤）：
+在仓库根目录执行。ROS 依赖通过 `rosdep` 安装；实际 AirSim 模式还需初始化 pip 依赖：
+
+```bash
+source /opt/ros/foxy/setup.bash
+rosdep install --from-paths src/air/uav_mission_safety_manager --ignore-src --rosdistro foxy -r -y
+# AirSim 安装脚本提前导入这两项，首次安装需先准备构建工具和这两项。
+python3 -m pip install --user "setuptools>=45.2.0,<76" "wheel<0.46" numpy==1.17.4 msgpack-rpc-python==0.4.1
+python3 -m pip install --user --no-build-isolation -r src/air/uav_mission_safety_manager/requirements.txt
+```
+
+`requirements.txt` 面向 Python 3.8，包含 AirSim 客户端及其兼容依赖；仅离线运行可跳过两条 pip 命令。然后构建并检查：
 
 ```bash
 source /opt/ros/foxy/setup.bash

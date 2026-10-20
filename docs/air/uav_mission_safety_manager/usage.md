@@ -13,12 +13,14 @@ colcon build --symlink-install --packages-select uav_mission_safety_manager
 source install/setup.bash
 ```
 
-AirSim 模式另需安装 Python 客户端：
+AirSim 模式另需安装包内 `requirements.txt` 中的 Python 依赖。AirSim 的安装脚本会提前导入 NumPy 和 RPC 客户端，首次安装需先准备构建工具和这两项，并关闭隔离构建：
 
 ```bash
-python3 -m pip install --user numpy msgpack-rpc-python
-python3 -m pip install --user airsim==1.8.1
+python3 -m pip install --user "setuptools>=45.2.0,<76" "wheel<0.46" numpy==1.17.4 msgpack-rpc-python==0.4.1
+python3 -m pip install --user --no-build-isolation -r src/air/uav_mission_safety_manager/requirements.txt
 ```
+
+依赖版本面向 Python 3.8；OpenCV 使用兼容该环境的 4.5.5.64。`rclpy`、消息类型和 launch 等 ROS 依赖由 `package.xml` 声明，通过上述 `rosdep` 安装，不从 pip 安装。仅运行离线状态机时无需安装 AirSim 依赖。
 
 ## 启动节点
 
