@@ -7,7 +7,6 @@ ROS2 Foxy / Ubuntu 20.04 的 `ament_python` 包，支持单航点、暂停/继�
 - [模块概览](../../../docs/air/uav_mission_safety_manager/overview.md)
 - [构建与运行教程](../../../docs/air/uav_mission_safety_manager/usage.md)：依赖、WSL 地址、命令话题、服务、离线与实际模拟器复测命令。
 - [AirSim 实测及已知限制](../../../docs/air/uav_mission_safety_manager/airsim_validation.md)
-- [原始日志索引](tests/logs/README.md)：文件说明及内容一致的 SHA256。
 
 以上链接用于仓库源码视图；安装后的 share 目录可通过项目文档站 https://openhutb.github.io/ros2/ 阅读教程。
 
@@ -36,13 +35,11 @@ uav_mission_safety_manager/
     ├── test_state_machine.py
     ├── ros_smoke.py
     ├── live_airsim_validation.py
-    ├── ros_airsim_validation.py
-    └── logs/                   # 已审核的历史测试证据
+    └── ros_airsim_validation.py
 ```
 
-教程位于 `docs/air/uav_mission_safety_manager/`，日志位于 `tests/logs/`。
-Python 与日志文件使用英文下划线命名，文件名不包含日期；README、LICENSE 和 ROS 约定文件名保持通用写法。
-本包采用 ROS2 标准 Python 包布局，不使用参考 ROS1 项目的 catkin 安装方式。
+教程位于 `docs/air/uav_mission_safety_manager/`。
+Python 文件使用英文下划线命名，文件名不包含日期；README、LICENSE 和 ROS 约定文件名保持通用写法。
 
 ## 快速构建与检查
 
@@ -70,7 +67,7 @@ ros2 run uav_mission_safety_manager mission_manager --ros-args -p use_airsim:=fa
 ```
 
 实际 AirSim 模式、依赖及飞行操作请遵循完整教程。状态机启动不会自动连接、解锁或起飞。
-2026-10-19 的实际模拟器测试记录已保留，目录调整不构成新增飞行验证。
+实际模拟器测试结论与限制见上述验证文档。
 
 ## 已知限制
 
