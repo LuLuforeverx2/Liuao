@@ -71,6 +71,8 @@ python3 -m unittest discover -s src/air/uav_mission_safety_manager/tests -v
 ROS_DOMAIN_ID=87 python3 src/air/uav_mission_safety_manager/tests/ros_smoke.py
 ```
 
+队列边界测试还覆盖 100 点上限、非零起点高度、非法装载保持原队列，以及终止状态不会重新派发旧航点。
+
 先用默认离线模式检查节点启动：
 
 ```bash
@@ -91,7 +93,7 @@ ros2 run uav_mission_safety_manager mission_manager --ros-args -p use_airsim:=fa
 
 起飞 RPC 可能返回 False 但遥测显示已离地，原因未确定。FAILSAFE 不保证自动降落，停止节点不会停止模拟器飞行任务。
 坐标为 AirSim NED；普通航点容差为 1 米。屋顶落地兼容逻辑仅限记录起点，不代表任意地形或真机验证。
-多航点队列的本次验证使用本地运动演示适配器，尚未执行 AirSim 队列飞行。未实现 ROS2 Action、避障或实际电子围栏。详见新教程与历史实测记录。
+多航点队列已在本地运动演示适配器和 AirSim 中验证：本轮 AirSim 复测覆盖三航点顺序执行与返航落地；暂停、继续和取消另见此前的[AirSim 队列复测记录](tests/logs/waypoint_queue_airsim_manual.md)，本轮详细状态与截图见[PR #542 复测记录](tests/logs/mission_queue_pr542_airsim.md)。本轮仍观察到起飞 RPC 返回 `False`，原因未确定。未实现 ROS2 Action、避障或实际电子围栏。详见新教程与实测记录。
 
 ## 维护与许可证
 
