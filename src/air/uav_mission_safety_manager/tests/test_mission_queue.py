@@ -64,6 +64,24 @@ class TestMissionQueue(unittest.TestCase):
                 self.assertEqual(self.adapter.calls, [])
                 self.assertEqual(self.c.mission_queue.state, 'IDLE')
 
+    def test_invalid_altitude_limits_are_rejected_before_dispatch(self):
+        invalid_limits = [
+            (float('nan'), 50),
+            (float('inf'), 50),
+            (0, float('inf')),
+            (0, 0),
+            (0, -1),
+            (True, 50),
+            (0, False),
+            ('0', 50),
+        ]
+        for home_z, max_altitude in invalid_limits:
+            with self.subTest(home_z=home_z, max_altitude=max_altitude):
+                with self.assertRaises(ValueError):
+                    self.c.mission_queue.load(self.points, home_z, max_altitude)
+                self.assertEqual(self.c.mission_queue.state, 'IDLE')
+                self.assertEqual(self.c.mission_queue.waypoints, ())
+
     def test_pause_retains_index_and_resume_reissues_same_target(self):
         self.start()
         self.c.request('pause')

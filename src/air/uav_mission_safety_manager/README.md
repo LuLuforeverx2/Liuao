@@ -30,13 +30,18 @@ uav_mission_safety_manager/
 │   ├── main.py                 # ROS 节点与 main() 入口
 │   ├── controller.py           # 非阻塞控制器
 │   ├── state_machine.py
+│   ├── mission_queue.py        # 多航点队列校验与进度
 │   ├── airsim_adapter.py
+│   ├── demo_adapter.py         # Humble 本地运动演示适配器
 │   └── mock_adapter.py
 └── tests/
     ├── test_adapter.py
     ├── test_controller.py
     ├── test_state_machine.py
+    ├── test_mission_queue.py
+    ├── test_demo_adapter.py
     ├── ros_smoke.py
+    ├── ros_queue_smoke.py
     ├── live_airsim_validation.py
     └── ros_airsim_validation.py
 ```
