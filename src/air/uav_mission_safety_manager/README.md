@@ -93,7 +93,7 @@ ros2 run uav_mission_safety_manager mission_manager --ros-args -p use_airsim:=fa
 
 起飞 RPC 可能返回 False 但遥测显示已离地，原因未确定。FAILSAFE 不保证自动降落，停止节点不会停止模拟器飞行任务。
 坐标为 AirSim NED；普通航点容差为 1 米。屋顶落地兼容逻辑仅限记录起点，不代表任意地形或真机验证。
-多航点队列已在本地运动演示适配器和 AirSim 中验证：PR #542 补充 AirSim 复测覆盖三航点顺序执行、执行中暂停/继续、取消与返航落地；此前记录见[AirSim 队列复测记录](../../../docs/air/uav_mission_safety_manager/validation/waypoint_queue_airsim_manual.md)，本轮详细状态与截图见[PR #542 复测记录](../../../docs/air/uav_mission_safety_manager/validation/mission_queue_pr542_airsim.md)。本轮仍观察到起飞 RPC 返回 `False`，原因未确定。未实现 ROS2 Action、避障或实际电子围栏。详见新教程与实测记录。
+多航点队列已在本地运动演示适配器和 AirSim 中验证：PR #542 补充 AirSim 复测覆盖三航点顺序执行、执行中暂停/继续、取消与返航落地；此前记录见[AirSim 队列复测记录](../../../docs/air/uav_mission_safety_manager/validation/waypoint_queue_airsim_manual.md)，本轮操作与结果说明见[PR #542 复测记录](../../../docs/air/uav_mission_safety_manager/validation/mission_queue_pr542_airsim.md)。本轮仍观察到起飞 RPC 返回 `False`，原因未确定。未实现 ROS2 Action、避障或实际电子围栏。详见新教程与实测记录。
 
 ## 维护与许可证
 
