@@ -117,8 +117,11 @@ Action 结果返回前拒绝话题的 `mission`、`goto` 和 `reset`，避免覆
 
 ## 验证范围与限制
 
-本接口在 Humble 的 demo 适配器下验证，尚未进行本次 Action 的 AirSim 手动复测、
-真机验证或 Foxy 构建。此前队列的 AirSim 结果不作为本接口的新验证证据。
+本接口已在 Humble 的 demo 适配器下自动验证，并于 2026-10-28 在 WSL2 Ubuntu 22.04.5 / ROS 2 Humble
+与 OpenHUTB Air 模拟器中完成手动复测：三航点任务以 `SUCCEEDED / COMPLETED` 结束，
+Action 客户端取消以 `CANCELED` 结束，返航服务抢占以 `ABORTED` 结束，随后遥测确认
+`RETURNING → LANDING → LANDED`。起飞 RPC 返回 `False`，但遥测确认已进入 `EXECUTING`；该既有异常保留记录。
+这些结果来自模拟器，不是真机；本接口尚未进行真机验证或 Foxy 构建。
 该接口不自动连接、解锁、起飞、避障或落地。COMPLETED 仍采用原有 1 米到达容差，
 表示已请求悬停，不保证停稳；网络中断下的取消和 FAILSAFE 不保证物理停机或自动降落。
 已有起飞 RPC 返回 False 的异常仍未修复。
