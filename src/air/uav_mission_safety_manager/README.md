@@ -98,7 +98,7 @@ ros2 run uav_mission_safety_manager mission_manager --ros-args -p use_airsim:=fa
 
 起飞 RPC 可能返回 False 但遥测显示已离地，原因未确定。FAILSAFE 不保证自动降落，停止节点不会停止模拟器飞行任务。
 坐标为 AirSim NED；普通航点容差为 1 米。屋顶落地兼容逻辑仅限记录起点，不代表任意地形或真机验证。
-多航点队列已在本地运动演示适配器和 AirSim 中验证，覆盖三航点顺序执行、执行中暂停/继续、取消与返航落地。此前记录见[AirSim 队列复测记录](../../../docs/air/uav_mission_safety_manager/validation/waypoint_queue_airsim_validation.md)。新增 ROS 2 Action 接口已完成 Humble demo 自动验证，以及作者在 OpenHUTB Air 场景中的手动复测，覆盖三航点成功、客户端取消、返航抢占及最终落地；另有同学在 AirSim Blocks 中完成构建、Action 测试和仿真飞行复测，该同学尚未验证 OpenHUTB Air 发行场景。详见[Action 教程](../../../docs/air/uav_mission_safety_manager/mission_action.md)。本接口未验证真机或 Foxy 构建，未实现避障或实际电子围栏。
+多航点队列已在本地运动演示适配器和 AirSim 中验证，覆盖三航点顺序执行、执行中暂停/继续、取消与返航落地。此前记录见[AirSim 队列复测记录](../../../docs/air/uav_mission_safety_manager/validation/waypoint_queue_airsim_validation.md)。新增 ROS 2 Action 接口已完成 Humble demo 自动验证，以及在 OpenHUTB Air 场景中的手动复测，覆盖三航点成功、客户端取消、返航抢占及最终落地。详见[Action 教程](../../../docs/air/uav_mission_safety_manager/mission_action.md)。本接口未实现避障或实际电子围栏。
 
 ## 维护与许可证
 
